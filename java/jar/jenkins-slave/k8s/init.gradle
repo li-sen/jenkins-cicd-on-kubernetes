@@ -1,0 +1,35 @@
+ext {
+        nexus = 'http://xx:8087/nexus/content/groups/public/'
+        username = 'admin'
+        password = 'xxxx'
+}
+
+allprojects{
+  repositories {
+    all { ArtifactRepository repo ->
+      if(repo instanceof MavenArtifactRepository){
+        def url = repo.url.toString()
+        if (url.startsWith('https://repo1.maven.org/maven2') || url.startsWith('https://jcenter.bintray.com/') || !url.startsWith(nexus)) {
+          project.logger.lifecycle "Repository ${repo.url} replaced by ${nexus}."
+          remove repo
+        }
+      }
+    }
+    maven {
+      url nexus
+    }
+  }
+}
+
+settingsEvaluated { settings ->
+    settings.pluginManagement {
+        resolutionStrategy {
+
+        }
+        repositories {
+            maven {
+              url nexus
+            }
+        }
+    }
+}
